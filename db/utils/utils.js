@@ -22,7 +22,7 @@ exports.formatComments = (comments, articleRef) => {
   return comments.map(comment => {
     const { belongs_to, created_by, created_at, ...resOfComments } = comment;
     const newObj = {
-      article_id: articleRef[comment],
+      article_id: articleRef[belongs_to],
       author: created_by,
       created_at: new Date(created_at),
       ...resOfComments

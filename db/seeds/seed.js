@@ -28,8 +28,8 @@ exports.seed = function(knex) {
       */
 
       const articleRef = makeRefObj(articleRows, 'title', 'article_id' );
-      console.log(articleRef)
       const formattedComments = formatComments(commentData, articleRef);
+      console.log(formatComments)
       return knex('comments').insert(formattedComments);
     });
 };
