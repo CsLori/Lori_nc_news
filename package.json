@@ -14,7 +14,8 @@
     "migrate-rollback": "knex migrate:rollback",
     "migrate-latest": "knex migrate:latest",
     "migrate-latest-test": "NODE_ENV=test knex migrate:latest",
-    "migrate-rollback-test": "NODE_ENV=test kenx migrate:rollback"
+    "migrate-rollback-test": "NODE_ENV=test kenx migrate:rollback",
+    "dev": "nodemon listen.js"
   },
   "repository": {
     "type": "git",

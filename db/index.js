@@ -1,11 +1,9 @@
-const ENV = process.env.NODE_ENV || 'development';
+const { Client } = require('pg');
+const dbConfig = require('./connection');
+const client = new Client(dbConfig);
 
-const testData = require('./data/test-data');
-const devData = require('./data/development-data');
+client.connect().then(() => {
+    console.log('connected to db');
+});
 
-const data = {
-  test: testData,
-  development: devData
-};
-
-module.exports = data[ENV];
+module.exports = client;
