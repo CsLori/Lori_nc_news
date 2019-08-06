@@ -120,7 +120,7 @@ describe('/app', () => {
           expect(msg).to.equal('Bad request');
         });
     });
-    it.only('POST status 201 responds with a comment object containing username and comment body', () => {
+    it('POST status 201 responds with a comment object containing username and comment body', () => {
       return request(app)
         .post('/api/articles/1/comments')
         .send({
@@ -130,7 +130,6 @@ describe('/app', () => {
         })
         .expect(201)
         .then(({ body }) => {
-          console.log(body);
           expect(body.comment.body).to.equal(
             "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!"
           );
@@ -142,8 +141,30 @@ describe('/app', () => {
             'created_at',
             'body'
           );
-          expect(body.comment.author).to.equal('butter_bridge')
+          expect(body.comment.author).to.equal('butter_bridge');
         });
+    });
+    it.only('GET status 200 responds with an array of comments objects sorted_by created_at by default', () => {
+      return request(app)
+        .get('/api/articles/1/comments')
+        .expect(200)
+        .then(({ body }) => {
+          console.log(body.comment);
+          expect(body.comment).to.be.sortedBy('created_at');
+          expect(body.comment[0]).to.have.keys(
+            'comment_id',
+            'author',
+            'article_id',
+            'votes',
+            'created_at',
+            'body'
+          );
+        });
+    });
+    it('GET status 200 responds with an array of comments objects ordered_by desc by default', () => {
+      return request(app)
+        .get('/api/articles/1/comments')
+        .expect(200);
     });
   });
 });

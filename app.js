@@ -6,10 +6,6 @@ app.use(express.json());
 
 app.use('/api', apiRouter);
 
-app.all('/*', (req, res, next) => {
-  next({ status: 404, msg: 'Not found' });
-});
-
 app.use((err, req, res, next) => {
   // console.log(err);
   errCodes = { '22P02': 'Bad request', '42703': 'Invalid user input' };
@@ -19,9 +15,14 @@ app.use((err, req, res, next) => {
   } else next(err);
 });
 
+app.all('/*', (req, res, next) => {
+  next({ status: 404, msg: 'Not found' });
+});
+
 app.use((err, req, res, next) => {
   if (err.status) {
     res.status(err.status).send({ msg: err.msg });
   } else next(err);
 });
+
 module.exports = app;

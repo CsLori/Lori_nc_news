@@ -44,3 +44,12 @@ exports.addCommentById = comment => {
     .into('comments')
     .returning('*');
 };
+
+exports.fetchCommentsById = ({ article_id, sort_by, order_by }) => {
+  return connection
+    .select('*')
+    .from('comments')
+    .where({ article_id })
+    .orderBy(sort_by || 'created_at', order_by || 'desc')
+    .returning('*');
+};
