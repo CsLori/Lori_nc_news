@@ -10,7 +10,7 @@ const connection = require('../db/connection');
 
 describe('/app', () => {
   beforeEach(() => {
-    return connection.seed.run;
+    return connection.seed.run();
   });
   after(() => {
     return connection.destroy();
@@ -72,11 +72,11 @@ describe('/app', () => {
               body: 'I find this existence challenging',
               created_at: '2018-11-15T12:21:54.171Z',
               votes: 100,
-              comment_count: "13"
+              comment_count: '13'
             });
           });
       });
-      it('ERROR - status 404 responds with "Not found" message', () => {
+      it('ERROR - GET status 404 responds with "Not found" message', () => {
         return request(app)
           .get('/api/articles/15')
           .expect(404)
@@ -85,7 +85,7 @@ describe('/app', () => {
           });
       });
     });
-    it('ERROR - status 400 responds with "Bad request" message', () => {
+    it('ERROR - GET status 400 responds with "Bad request" message', () => {
       return request(app)
         .get('/api/articles/bakfitty')
         .expect(400)
@@ -93,10 +93,35 @@ describe('/app', () => {
           expect(body.msg).to.equal('Bad request');
         });
     });
-    it('PATCH status 201 responds with an article object selected by article_id', () => {
+    it('PATCH status 200 responds with an article object selected by article_id', () => {
       return request(app)
         .patch('/api/articles/1')
-        .expect(201);
+        .send({ inc_vote: 100 })
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.article.votes).to.equal(101);
+        });
+    });
+    it('ERROR - PATCH status 404 responds with a "Not found" message', () => {
+      return request(app)
+        .patch('/api/articles/34')
+        .send({ inc_vote: 100 })
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).to.equal('Not found');
+        });
+    });
+    it('ERROR - PATCH status 400 responds with a "Bad request" message', () => {
+      return request(app)
+        .patch('/api/articles/badboy')
+        .send({ inc_vote: 100 })
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).to.equal('Bad request');
+        });
+    });
+    it('POST status 201 responds with a comment object containing username and comment body', () => {
+      return request(app)
     });
   });
 });
