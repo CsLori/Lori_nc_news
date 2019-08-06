@@ -2,7 +2,6 @@ const { fetchArticleById } = require('../models/articles-model');
 const { patchArticleById } = require('../models/articles-model');
 const { addCommentById } = require('../models/articles-model');
 
-
 exports.getArticleById = (req, res, next) => {
   fetchArticleById(req.params)
     .then(article => {
@@ -20,7 +19,11 @@ exports.updateArticleById = (req, res, next) => {
 };
 
 exports.insertCommentById = (req, res, next) => {
-    addCommentById().then((comment)=> {
-        
+  // console.log(req.params, req.body);
+  addCommentById({ ...req.params, ...req.body })
+    .then(([comment]) => {
+      // console.log(comment);
+      res.status(201).send({ comment });
     })
+    .catch(console.log);
 };

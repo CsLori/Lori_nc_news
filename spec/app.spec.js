@@ -120,8 +120,30 @@ describe('/app', () => {
           expect(msg).to.equal('Bad request');
         });
     });
-    it('POST status 201 responds with a comment object containing username and comment body', () => {
+    it.only('POST status 201 responds with a comment object containing username and comment body', () => {
       return request(app)
+        .post('/api/articles/1/comments')
+        .send({
+          author: 'butter_bridge',
+          body:
+            "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!"
+        })
+        .expect(201)
+        .then(({ body }) => {
+          console.log(body);
+          expect(body.comment.body).to.equal(
+            "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!"
+          );
+          expect(body.comment).to.have.keys(
+            'comment_id',
+            'author',
+            'article_id',
+            'votes',
+            'created_at',
+            'body'
+          );
+          expect(body.comment.author).to.equal('butter_bridge')
+        });
     });
   });
 });

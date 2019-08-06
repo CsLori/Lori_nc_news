@@ -17,10 +17,11 @@ app.use((err, req, res, next) => {
   if (errCodes[err.code]) {
     res.status(400).send({ msg: errCodes[err.code] });
   } else next(err);
+});
 
+app.use((err, req, res, next) => {
   if (err.status) {
     res.status(err.status).send({ msg: err.msg });
   } else next(err);
 });
-
 module.exports = app;

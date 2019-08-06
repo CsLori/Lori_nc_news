@@ -28,7 +28,7 @@ exports.patchArticleById = ({ article_id, inc_vote }) => {
   return connection
     .select('*')
     .from('articles')
-    .where({article_id} )
+    .where({ article_id })
     .increment('votes', inc_vote)
     .returning('*')
     .then(article => {
@@ -36,4 +36,11 @@ exports.patchArticleById = ({ article_id, inc_vote }) => {
         return Promise.reject({ status: 404, msg: 'Not found' });
       } else return article;
     });
+};
+
+exports.addCommentById = comment => {
+  return connection
+    .insert(comment)
+    .into('comments')
+    .returning('*');
 };
