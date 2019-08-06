@@ -5,5 +5,10 @@ exports.fetchUserByUsername = ({ username }) => {
     .select('*')
     .from('users')
     .where({ username })
-    .returning('*');
+    .returning('*')
+    .then(user => {
+      if (!user.length) {
+        return Promise.reject({ status: 404, msg: 'Not found' });
+      } else return user;
+    });
 };

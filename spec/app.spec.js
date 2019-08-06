@@ -49,6 +49,14 @@ describe('/app', () => {
             expect(body.user[0]).to.have.keys('username', 'name', 'avatar_url');
           });
       });
+      it('ERROR - status 404 responds with a message "Not found"', () => {
+        return request(app)
+          .get('/api/users/icellusedkars05')
+          .expect(404)
+          .then(({ body }) => {
+            expect(body.msg).to.equal('Not found');
+          });
+      });
     });
     describe('/articles', () => {
       it('GET status 200 responds with an article object selected by id', () => {
@@ -63,10 +71,32 @@ describe('/app', () => {
               author: 'butter_bridge',
               body: 'I find this existence challenging',
               created_at: '2018-11-15T12:21:54.171Z',
-              votes: 100
+              votes: 100,
+              comment_count: "13"
             });
           });
       });
+      it('ERROR - status 404 responds with "Not found" message', () => {
+        return request(app)
+          .get('/api/articles/15')
+          .expect(404)
+          .then(({ body }) => {
+            expect(body.msg).to.equal('Not found');
+          });
+      });
+    });
+    it('ERROR - status 400 responds with "Bad request" message', () => {
+      return request(app)
+        .get('/api/articles/bakfitty')
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).to.equal('Bad request');
+        });
+    });
+    it('PATCH status 201 responds with an article object selected by article_id', () => {
+      return request(app)
+        .patch('/api/articles/1')
+        .expect(201);
     });
   });
 });
