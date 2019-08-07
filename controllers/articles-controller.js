@@ -26,7 +26,7 @@ exports.insertCommentById = (req, res, next) => {
     .then(([comment]) => {
       res.status(201).send({ comment });
     })
-    .catch(console.log);
+    .catch(next);
 };
 
 exports.getCommentsById = (req, res, next) => {

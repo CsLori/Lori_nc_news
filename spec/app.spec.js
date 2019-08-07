@@ -150,6 +150,32 @@ describe('/app', () => {
           expect(body.comment.author).to.equal('butter_bridge');
         });
     });
+    it('ERROR - POST status 400 responds with "Not found" error message', () => {
+      return request(app)
+        .post('/api/articles/25/comments')
+        .send({
+          author: 'butter_bridge',
+          body:
+            "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!"
+        })
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).to.equal('Not found');
+        });
+    });
+    it('ERROR - POST status 400 responds with "Bad request" error message', () => {
+      return request(app)
+        .post('/api/articles/1/comments')
+        .send({
+          au: 'butter_bridge',
+          body:
+            "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!"
+        })
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).to.equal('Invalid user input');
+        });
+    });
     it('GET status 200 responds with an array of comments objects sorted_by created_at by default', () => {
       return request(app)
         .get('/api/articles/1/comments')
@@ -173,14 +199,13 @@ describe('/app', () => {
         .get('/api/articles/1/comments?order=asc')
         .expect(200)
         .then(({ body }) => {
-          // console.log(body)
           expect(body.comment).to.be.sortedBy('created_at', {
             ascending: true
           });
         });
     });
-    it('GET status 200 responds with an array of comment objects sorted_by asc', () => {
-
+    it('GET status 200 responds with an array of article objects', () => {
+      return 
     });
   });
 });

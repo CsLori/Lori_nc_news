@@ -8,7 +8,7 @@ app.use('/api', apiRouter);
 
 app.use((err, req, res, next) => {
   // console.log(err);
-  errCodes = { '22P02': 'Bad request', '42703': 'Invalid user input' };
+  errCodes = { '22P02': 'Bad request', '23503': 'Not found', '42703': 'Invalid user input' };
 
   if (errCodes[err.code]) {
     res.status(400).send({ msg: errCodes[err.code] });
