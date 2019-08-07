@@ -13,7 +13,7 @@ exports.fetchArticleById = ({ article_id }) => {
     )
     .from('articles')
     .where('articles.article_id', '=', article_id)
-    .join('comments', 'comments.article_id', '=', 'articles.article_id')
+    .leftJoin('comments', 'comments.article_id', '=', 'articles.article_id')
     .groupBy('articles.article_id')
     .count('comments.article_id as comment_count')
     .returning('*')
@@ -45,11 +45,11 @@ exports.addCommentById = comment => {
     .returning('*');
 };
 
-exports.fetchCommentsById = ({ article_id, sort_by, order_by }) => {
+exports.fetchCommentsById = ({ article_id }, { sort_by, order }) => {
   return connection
-    .select('*')
+    .select('comment_id', 'votes', 'created_at', 'author', 'body', 'article_id')
     .from('comments')
     .where({ article_id })
-    .orderBy(sort_by || 'created_at', order_by || 'desc')
+    .orderBy(sort_by || 'created_at', order || 'desc')
     .returning('*');
 };

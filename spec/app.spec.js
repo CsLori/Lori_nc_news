@@ -34,28 +34,34 @@ describe('/app', () => {
             expect(body.topics[0]).to.be.an('object');
           });
       });
-      it('GET status 200 responds with an object selected by username', () => {
-        return request(app)
-          .get('/api/users/icellusedkars')
-          .expect(200)
-          .then(({ body }) => {
-            expect(body.user[0]).to.be.an('object');
-            expect(body.user[0]).to.eql({
-              username: 'icellusedkars',
-              name: 'sam',
-              avatar_url:
-                'https://avatars2.githubusercontent.com/u/24604688?s=460&v=4'
+      describe('/users', () => {
+        it('GET status 200 responds with an object selected by username', () => {
+          return request(app)
+            .get('/api/users/icellusedkars')
+            .expect(200)
+            .then(({ body }) => {
+              expect(body.user[0]).to.be.an('object');
+              expect(body.user[0]).to.eql({
+                username: 'icellusedkars',
+                name: 'sam',
+                avatar_url:
+                  'https://avatars2.githubusercontent.com/u/24604688?s=460&v=4'
+              });
+              expect(body.user[0]).to.have.keys(
+                'username',
+                'name',
+                'avatar_url'
+              );
             });
-            expect(body.user[0]).to.have.keys('username', 'name', 'avatar_url');
-          });
-      });
-      it('ERROR - status 404 responds with a message "Not found"', () => {
-        return request(app)
-          .get('/api/users/icellusedkars05')
-          .expect(404)
-          .then(({ body }) => {
-            expect(body.msg).to.equal('Not found');
-          });
+        });
+        it('ERROR - status 404 responds with a message "Not found"', () => {
+          return request(app)
+            .get('/api/users/icellusedkars05')
+            .expect(404)
+            .then(({ body }) => {
+              expect(body.msg).to.equal('Not found');
+            });
+        });
       });
     });
     describe('/articles', () => {
@@ -144,13 +150,14 @@ describe('/app', () => {
           expect(body.comment.author).to.equal('butter_bridge');
         });
     });
-    it.only('GET status 200 responds with an array of comments objects sorted_by created_at by default', () => {
+    it('GET status 200 responds with an array of comments objects sorted_by created_at by default', () => {
       return request(app)
         .get('/api/articles/1/comments')
         .expect(200)
         .then(({ body }) => {
-          console.log(body.comment);
-          expect(body.comment).to.be.sortedBy('created_at');
+          expect(body.comment).to.be.sortedBy('created_at', {
+            descending: true
+          });
           expect(body.comment[0]).to.have.keys(
             'comment_id',
             'author',
@@ -161,10 +168,19 @@ describe('/app', () => {
           );
         });
     });
-    it('GET status 200 responds with an array of comments objects ordered_by desc by default', () => {
+    it('GET status 200 responds with an array of comment objects ordered_by asc', () => {
       return request(app)
-        .get('/api/articles/1/comments')
-        .expect(200);
+        .get('/api/articles/1/comments?order=asc')
+        .expect(200)
+        .then(({ body }) => {
+          // console.log(body)
+          expect(body.comment).to.be.sortedBy('created_at', {
+            ascending: true
+          });
+        });
+    });
+    it('GET status 200 responds with an array of comment objects sorted_by asc', () => {
+
     });
   });
 });

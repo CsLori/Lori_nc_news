@@ -25,4 +25,8 @@ app.use((err, req, res, next) => {
   } else next(err);
 });
 
+app.use((err, req, res, next) => {
+  res.status(500).send({ msg: 'Ooops, not your day....' });
+});
+
 module.exports = app;

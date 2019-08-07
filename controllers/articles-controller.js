@@ -30,9 +30,8 @@ exports.insertCommentById = (req, res, next) => {
 };
 
 exports.getCommentsById = (req, res, next) => {
-  console.log(req.query);
   fetchCommentsById(req.params, req.query)
-    .then(comment => {
+    .then((comment) => {
       res.status(200).send({ comment });
     })
     .catch(next);
