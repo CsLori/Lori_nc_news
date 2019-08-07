@@ -16,7 +16,7 @@ exports.fetchArticleById = ({ article_id }) => {
     .leftJoin('comments', 'comments.article_id', '=', 'articles.article_id')
     .groupBy('articles.article_id')
     .count('comments.article_id as comment_count')
-    .returning('*')
+
     .then(article => {
       if (!article.length) {
         return Promise.reject({ status: 404, msg: 'Not found' });
@@ -50,11 +50,10 @@ exports.fetchCommentsById = ({ article_id }, { sort_by, order }) => {
     .select('comment_id', 'votes', 'created_at', 'author', 'body', 'article_id')
     .from('comments')
     .where({ article_id })
-    .orderBy(sort_by || 'created_at', order || 'desc')
-    .returning('*');
+    .orderBy(sort_by || 'created_at', order || 'desc');
 };
 
-exports.selectAllArticles = ({ sort_by, order }) => {
+exports.selectAllArticles = ({ sort_by, order, author, topic }) => {
   return connection
     .select(
       'articles.author',
@@ -69,5 +68,19 @@ exports.selectAllArticles = ({ sort_by, order }) => {
     .groupBy('articles.article_id')
     .count('comments.article_id AS comment_count')
     .orderBy(sort_by || 'created_at', order || 'desc')
-    .returning('*');
+    .modify(authorQuery => {
+      if (author) {
+        authorQuery.where('articles.author', '=', author);
+      }
+    })
+    .modify(topicQuery => {
+      if (topic) {
+        topicQuery.where('articles.topic', '=', topic);
+      }
+    })
+    .then(article => {
+      if (!article.length) {
+        return Promise.reject({ status: 404, msg: 'Not found' });
+      } else return article;
+    });
 };
