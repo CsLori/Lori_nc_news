@@ -53,3 +53,21 @@ exports.fetchCommentsById = ({ article_id }, { sort_by, order }) => {
     .orderBy(sort_by || 'created_at', order || 'desc')
     .returning('*');
 };
+
+exports.selectAllArticles = ({ sort_by, order }) => {
+  return connection
+    .select(
+      'articles.author',
+      'title',
+      'articles.article_id',
+      'topic',
+      'articles.created_at',
+      'articles.votes'
+    )
+    .from('articles')
+    .leftJoin('comments', 'comments.article_id', 'articles.article_id')
+    .groupBy('articles.article_id')
+    .count('comments.article_id AS comment_count')
+    .orderBy(sort_by || 'created_at', order || 'desc')
+    .returning('*');
+};

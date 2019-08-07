@@ -205,7 +205,73 @@ describe('/app', () => {
         });
     });
     it('GET status 200 responds with an array of article objects', () => {
-      return 
+      return request(app)
+        .get('/api/articles')
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.articles).to.be.an('array');
+          expect(body.articles[0]).to.be.an('object');
+        });
+    });
+    it('GET status 200 responds with author, title, article_id, topic, created_at, votes properties', () => {
+      return request(app)
+        .get('/api/articles')
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.articles[0]).to.have.keys(
+            'author',
+            'title',
+            'article_id',
+            'topic',
+            'created_at',
+            'votes',
+            'comment_count'
+          );
+        });
+    });
+    it('GET status 200 responds with an array of artcile objects sorted_by date by default', () => {
+      return request(app)
+        .get('/api/articles')
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.articles).to.be.sortedBy('created_at');
+        });
+    });
+    it('GET status 200 responds with an array of artcile objects sorted_by date by given query', () => {
+      return request(app)
+        .get('/api/articles?sort_by=topic')
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.articles).to.be.sortedBy('topic');
+        });
+    });
+    it('ERROR - GET status 400 responds with "Bad request" error message', () => {
+      return request(app)
+        .get('/api/articles?sort_by=top')
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).to.equal('Invalid user input');
+        });
+    });
+    it('GET status 200 responds with an array of article objects ordered_by desc by default', () => {
+      return request(app)
+        .get('/api/articles')
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.articles).to.be.sortedBy('created_at', {
+            descending: true
+          });
+        });
+    });
+    it.only('GET status 200 repsonds with an array of article objects ordered_by a valid custom column', () => {
+      return request(app)
+        .get('/api/articles?order=asc')
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.articles).to.be.sortedBy('created_at', {
+            ascending: true
+          });
+        });
     });
   });
 });
