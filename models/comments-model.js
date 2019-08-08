@@ -6,7 +6,9 @@ exports.patchCommentById = ({ comment_id }, { inc_votes = 0 }) => {
     .increment('votes', inc_votes)
     .returning('*')
     .then(comment => {
-      if (!inc_votes === undefined) {
+      if (!comment.length) {
+        return Promise.reject({ status: 404, msg: 'Comment Not found' });
+      } else if (!inc_votes === undefined) {
         return Promise.reject({ status: 404, msg: 'Not found' });
       } else return comment;
     });

@@ -8,8 +8,7 @@ exports.updateCommentById = (req, res, next) => {
     .then(comment => {
       if (!comment.length) {
         res.status(404).send({ msg: 'Comment Not found' });
-      } else if (Object.keys(req.body) !== 'inc_votes') {
-        res.status(200).send({ comment });
+      
       } else res.status(200).send({ comment });
     })
     .catch(next);

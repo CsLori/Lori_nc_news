@@ -146,7 +146,7 @@ describe('/app', () => {
             expect(body.comment.author).to.equal('butter_bridge');
           });
       });
-      it('ERROR - POST status 400 responds with "Not found" error message', () => {
+      it('ERROR - POST status 422 responds with "Not found" error message', () => {
         return request(app)
           .post('/api/articles/25/comments')
           .send({
@@ -154,9 +154,9 @@ describe('/app', () => {
             body:
               "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!"
           })
-          .expect(400)
+          .expect(422)
           .then(({ body: { msg } }) => {
-            expect(msg).to.equal('Not found');
+            expect(msg).to.equal('Id does not exist');
           });
       });
       it('ERROR - POST status 400 responds with "Bad request" error message', () => {
@@ -188,6 +188,22 @@ describe('/app', () => {
               'created_at',
               'body'
             );
+          });
+      });
+      it('ERROR - GET 400 responds with "Not found" error message', () => {
+        return request(app)
+          .get('/api/articles/bb/comments')
+          .expect(400)
+          .then(({ body }) => {
+            expect(body.msg).to.equal('Bad request');
+          });
+      });
+      it('ERROR - GET 404 responds with "Not found" error message', () => {
+        return request(app)
+          .get('/api/articles/25/comments')
+          .expect(404)
+          .then(({ body }) => {
+            expect(body.msg).to.equal('Not found');
           });
       });
       it('GET status 200 responds with an array of comment objects ordered_by asc', () => {
@@ -299,6 +315,14 @@ describe('/app', () => {
             expect(body.msg).to.equal('Not found');
           });
       });
+      it('GET 200 responds with an array of article objects up to 10 findings', () => {
+        return request(app)
+          .get('/api/articles')
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.articles).to.have.length(10);
+          });
+      });
     });
 
     describe('/comments', () => {
@@ -329,7 +353,7 @@ describe('/app', () => {
             );
           });
       });
-      it('ERROR - PATCH - 200 responds with the original comment with its votes remaining unchanged', () => {
+      it('ERROR - PATCH status 200 responds with the original comment with its votes remaining unchanged when adding non-existing column', () => {
         return request(app)
           .patch('/api/comments/1')
           .send({ unknown_key: 16 })
@@ -338,7 +362,7 @@ describe('/app', () => {
             expect(body.comment[0].votes).to.equal(16);
           });
       });
-      it('ERROR -PATCH - 404 responds with Not Found when given comment_id that does not exist', () => {
+      it('ERROR -PATCH - 404 responds with "Not Found" error message when given comment_id that does not exist', () => {
         return request(app)
           .patch('/api/comments/350')
           .send({ inv_votes: 16 })
@@ -352,7 +376,7 @@ describe('/app', () => {
           .delete('/api/comments/1')
           .expect(204);
       });
-      it('ERROR -DELETE - 400 returns bad request when given incorrect param endpoint', () => {
+      it('ERROR -DELETE - 400 returns bad request when given incorrect comment_id', () => {
         return request(app)
           .delete('/api/comments/bananananas')
           .expect(400)
