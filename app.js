@@ -7,7 +7,7 @@ app.use(express.json());
 app.use('/api', apiRouter);
 
 app.use((err, req, res, next) => {
-  // console.log(err);
+  console.log(err);
 
   errCodes = {
     '22P02': 'Bad request',
