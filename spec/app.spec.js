@@ -34,6 +34,30 @@ describe('/app', () => {
             expect(body.topics[0]).to.be.an('object');
           });
       });
+      it('ERROR - DELETE status 405 responds with "Method not allowed" error message', () => {
+        return request(app)
+          .delete('/api/topics')
+          .expect(405)
+          .then(({ body }) => {
+            expect(body.msg).to.equal('Method not allowed');
+          });
+      });
+      it('ERROR - PATCH status 405 responds with "Method not allowed" error message', () => {
+        return request(app)
+          .patch('/api/topics')
+          .expect(405)
+          .then(({ body }) => {
+            expect(body.msg).to.equal('Method not allowed');
+          });
+      });
+      it('ERROR - PUT status 405 responds with "Method not allowed" error message', () => {
+        return request(app)
+          .put('/api/topics')
+          .expect(405)
+          .then(({ body }) => {
+            expect(body.msg).to.equal('Method not allowed');
+          });
+      });
     });
     describe('/users', () => {
       it('GET status 200 responds with an object selected by username', () => {
@@ -59,6 +83,14 @@ describe('/app', () => {
             expect(body.msg).to.equal('Not found');
           });
       });
+      it('ERROR - POST status 405 responds with "Method not allowed" error message', () => {
+        return request(app)
+          .post('/api/users/icellusedkars')
+          .expect(405)
+          .then(({ body }) => {
+            expect(body.msg).to.equal('Method not allowed');
+          });
+      });
     });
     describe('/articles/:id', () => {
       it('GET status 200 responds with an article object selected by id', () => {
@@ -76,6 +108,14 @@ describe('/app', () => {
               votes: 100,
               comment_count: '13'
             });
+          });
+      });
+      it('ERROR - POST status 405 responds with "Method not allowed" error message', () => {
+        return request(app)
+          .post('/api/articles/1')
+          .expect(405)
+          .then(({ body }) => {
+            expect(body.msg).to.equal('Method not allowed');
           });
       });
       it('ERROR - GET status 404 responds with "Not found" message', () => {
@@ -98,7 +138,7 @@ describe('/app', () => {
       it('PATCH status 200 responds with an article object selected by article_id', () => {
         return request(app)
           .patch('/api/articles/1')
-          .send({ inc_vote: 100 })
+          .send({ inc_vote: 1 })
           .expect(200)
           .then(({ body }) => {
             expect(body.article.votes).to.equal(101);
@@ -110,6 +150,7 @@ describe('/app', () => {
           .send({ inc_vote: 100 })
           .expect(404)
           .then(({ body }) => {
+            console.log(body)
             expect(body.msg).to.equal('Not found');
           });
       });
@@ -174,9 +215,10 @@ describe('/app', () => {
       });
       it('GET status 200 responds with an array of comments objects sorted_by created_at by default', () => {
         return request(app)
-          .get('/api/articles/1/comments')
+          .get('/api/articles/5/comments')
           .expect(200)
           .then(({ body }) => {
+            // console.log(body)
             expect(body.comment).to.be.sortedBy('created_at', {
               descending: true
             });
@@ -225,6 +267,30 @@ describe('/app', () => {
           .then(({ body }) => {
             expect(body.articles).to.be.an('array');
             expect(body.articles[0]).to.be.an('object');
+          });
+      });
+      it('ERROR - DELETE status 405 responds with "Method not allowed" error message', () => {
+        return request(app)
+          .delete('/api/topics')
+          .expect(405)
+          .then(({ body }) => {
+            expect(body.msg).to.equal('Method not allowed');
+          });
+      });
+      it('ERROR - PATCH status 405 responds with "Method not allowed" error message', () => {
+        return request(app)
+          .patch('/api/topics')
+          .expect(405)
+          .then(({ body }) => {
+            expect(body.msg).to.equal('Method not allowed');
+          });
+      });
+      it('ERROR - PUT status 405 responds with "Method not allowed" error message', () => {
+        return request(app)
+          .put('/api/topics')
+          .expect(405)
+          .then(({ body }) => {
+            expect(body.msg).to.equal('Method not allowed');
           });
       });
       it('GET status 200 responds with author, title, article_id, topic, created_at, votes properties', () => {
@@ -353,6 +419,14 @@ describe('/app', () => {
             );
           });
       });
+      it('ERROR - POST status 405 responds with "Method not allowed" error message', () => {
+        return request(app)
+          .post('/api/comments/1')
+          .expect(405)
+          .then(({ body }) => {
+            expect(body.msg).to.equal('Method not allowed');
+          });
+      });
       it('ERROR - PATCH status 200 responds with the original comment with its votes remaining unchanged when adding non-existing column', () => {
         return request(app)
           .patch('/api/comments/1')
@@ -376,7 +450,7 @@ describe('/app', () => {
           .delete('/api/comments/1')
           .expect(204);
       });
-      it('ERROR -DELETE - 400 returns bad request when given incorrect comment_id', () => {
+      it('ERROR - DELETE - 400 returns bad request when given incorrect comment_id', () => {
         return request(app)
           .delete('/api/comments/bananananas')
           .expect(400)

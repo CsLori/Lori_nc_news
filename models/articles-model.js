@@ -1,6 +1,6 @@
 const connection = require('../db/connection');
 
-exports.fetchArticleById = ({ article_id }, { limit }) => {
+exports.fetchArticleById = ({ article_id }) => {
   return connection
     .select(
       'articles.author',
@@ -16,7 +16,6 @@ exports.fetchArticleById = ({ article_id }, { limit }) => {
     .leftJoin('comments', 'comments.article_id', '=', 'articles.article_id')
     .groupBy('articles.article_id')
     .count('comments.article_id as comment_count')
-    .limit(limit || 10)
     .then(article => {
       if (!article.length) {
         return Promise.reject({ status: 404, msg: 'Not found' });
@@ -24,7 +23,7 @@ exports.fetchArticleById = ({ article_id }, { limit }) => {
     });
 };
 
-exports.patchArticleById = ({ article_id, inc_vote }) => {
+exports.patchArticleById = ({ article_id }, { inc_vote }) => {
   return connection
     .select('*')
     .from('articles')
@@ -32,7 +31,9 @@ exports.patchArticleById = ({ article_id, inc_vote }) => {
     .increment('votes', inc_vote)
     .returning('*')
     .then(article => {
-      if (!article.length) {
+      if (typeof inc_vote !== 'number') {
+        return Promise.reject({ status: 400, msg: 'Bad request' });
+      } else if (!article.length) {
         return Promise.reject({ status: 404, msg: 'Not found' });
       } else return article;
     });
@@ -54,7 +55,7 @@ exports.fetchCommentsById = ({ article_id }, { sort_by, order }) => {
     .then(comment => {
       if (!comment.length) {
         return Promise.reject({ status: 404, msg: 'Not found' });
-      } else return comment
+      } else return comment;
     });
 };
 
@@ -73,6 +74,7 @@ exports.selectAllArticles = ({ sort_by, order, author, topic }) => {
     .groupBy('articles.article_id')
     .count('comments.article_id AS comment_count')
     .orderBy(sort_by || 'created_at', order || 'desc')
+    .limit(10)
     .modify(authorQuery => {
       if (author) {
         authorQuery.where('articles.author', '=', author);

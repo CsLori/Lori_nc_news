@@ -8,8 +8,8 @@ const {
 
 exports.getArticleById = (req, res, next) => {
   fetchArticleById(req.params, req.query)
-    .then(article => {
-      res.status(200).send({ article: article[0] });
+    .then(([article]) => {
+      res.status(200).send({ article });
     })
     .catch(next);
 };
@@ -32,7 +32,7 @@ exports.insertCommentById = (req, res, next) => {
 
 exports.getCommentsById = (req, res, next) => {
   fetchCommentsById(req.params, req.query)
-    .then(comment => {
+    .then((comment) => {
       res.status(200).send({ comment });
     })
     .catch(next);
