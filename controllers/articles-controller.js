@@ -33,19 +33,21 @@ exports.insertCommentById = (req, res, next) => {
 
 exports.getCommentsById = (req, res, next) => {
   const { article_id } = req.params;
-  console.log(req.params);
+  console.log(req.params, req.query, 'controller');
   const { sort_by, order } = req.query;
-  fetchArticleById(article_id)
-    .then()
-    .catch(next);
 
-  fetchCommentsById(article_id, sort_by, order)
-    .then(comments => {
-      res.status(200).send({ comments });
+  const article = fetchArticleById(article_id);
+  const comments = fetchCommentsById(article_id, sort_by, order);
+
+  Promise.all([article, comments])
+    .then(([article, comments]) => {
+      if (article[0].comment_count === 0) {
+        res.status(200).send({ comments: [] });
+      } else res.status(200).send({ comments });
+      return comments;
     })
     .catch(next);
 };
-
 exports.getAllArticles = (req, res, next) => {
   selectAllArticles(req.query)
     .then(articles => {

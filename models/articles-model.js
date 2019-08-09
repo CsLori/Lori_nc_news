@@ -47,21 +47,12 @@ exports.addCommentById = comment => {
 };
 
 exports.fetchCommentsById = (article_id, sort_by, order) => {
-  console.log(article_id)
   return connection
-    .select(
-      'comment_id',
-      'votes',
-      'created_at',
-      'author',
-      'body',
-      'article_id'
-    )
+    .select('comment_id', 'votes', 'created_at', 'author', 'body', 'article_id')
     .from('comments')
     .where('article_id', '=', article_id)
-    
-    .orderBy(sort_by || 'created_at', order || 'desc')
-    
+
+    .orderBy(sort_by || 'created_at', order || 'desc');
 };
 
 exports.selectAllArticles = ({ sort_by, order, author, topic }) => {
@@ -80,6 +71,7 @@ exports.selectAllArticles = ({ sort_by, order, author, topic }) => {
     .count('comments.article_id AS comment_count')
     .orderBy(sort_by || 'created_at', order || 'desc')
     .limit(10)
+    // .offset(p * limit - limit)
     .modify(authorQuery => {
       if (author) {
         authorQuery.where('articles.author', '=', author);
