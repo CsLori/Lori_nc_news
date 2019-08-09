@@ -1,6 +1,6 @@
 const connection = require('../db/connection');
 
-exports.fetchArticleById = ({ article_id }) => {
+exports.fetchArticleById = article_id => {
   return connection
     .select(
       'articles.author',
@@ -17,6 +17,7 @@ exports.fetchArticleById = ({ article_id }) => {
     .groupBy('articles.article_id')
     .count('comments.article_id as comment_count')
     .then(article => {
+      // console.log(article, 'controller')
       if (!article.length) {
         return Promise.reject({ status: 404, msg: 'Not found' });
       } else return article;
@@ -46,17 +47,22 @@ exports.addCommentById = comment => {
     .returning('*');
 };
 
-exports.fetchCommentsById = ({ article_id }, { sort_by, order }) => {
+exports.fetchCommentsById = (article_id, sort_by, order) => {
   return connection
-    .select('comment_id', 'votes', 'created_at', 'author', 'body', 'article_id')
+    .select(
+      'comments.comment_id',
+      'comments.votes',
+      'comments.created_at',
+      'comments.author',
+      'comments.body',
+      'comments.article_id'
+    )
     .from('comments')
-    .where({ article_id })
+    .where('comments.article_id', '=', article_id)
+    .leftJoin('articles', 'articles.article_id', 'comments.article_id')
+    .groupBy('comments.comment_id')
     .orderBy(sort_by || 'created_at', order || 'desc')
-    .then(comment => {
-      if (!comment.length) {
-        return Promise.reject({ status: 404, msg: 'Not found' });
-      } else return comment;
-    });
+    .returning('*');
 };
 
 exports.selectAllArticles = ({ sort_by, order, author, topic }) => {
@@ -86,6 +92,7 @@ exports.selectAllArticles = ({ sort_by, order, author, topic }) => {
       }
     })
     .then(article => {
+      // console.log(article, 'comment count');
       if (!article.length) {
         return Promise.reject({ status: 404, msg: 'Not found' });
       } else return article;

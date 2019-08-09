@@ -16,6 +16,14 @@ describe('/app', () => {
     return connection.destroy();
   });
   describe('/api', () => {
+    it('endpoint JSON', () => {
+      return request(app)
+        .get('/api')
+        .expect(200)
+        .then(({ body }) => {
+          expect(body).to.be.an('object');
+        });
+    });
     it('ERROR - status 404 responds with a "Page not found" error message', () => {
       return request(app)
         .get('/api/topucs')
@@ -150,7 +158,7 @@ describe('/app', () => {
           .send({ inc_vote: 100 })
           .expect(404)
           .then(({ body }) => {
-            console.log(body)
+            // console.log(body);
             expect(body.msg).to.equal('Not found');
           });
       });
@@ -238,6 +246,16 @@ describe('/app', () => {
           .expect(400)
           .then(({ body }) => {
             expect(body.msg).to.equal('Bad request');
+          });
+      });
+      it('GET 200 responds with an empty array when no comments found', () => {
+        return request(app)
+          .get('/api/articles/2/comments')
+          .expect(200)
+          .then(({ body }) => {
+            // console.log(body, '<======test');
+            expect(body.comment).to.be.an('array');
+            expect(body.comment.length).to.equal(0);
           });
       });
       it('ERROR - GET 404 responds with "Not found" error message', () => {
@@ -436,13 +454,22 @@ describe('/app', () => {
             expect(body.comment[0].votes).to.equal(16);
           });
       });
-      it('ERROR -PATCH - 404 responds with "Not Found" error message when given comment_id that does not exist', () => {
+      it('ERROR -PATCH - 404 responds with "Not Found" error message when given comment_id does not exist', () => {
         return request(app)
           .patch('/api/comments/350')
           .send({ inv_votes: 16 })
           .expect(404)
           .then(({ body }) => {
             expect(body.msg).to.equal('Comment Not found');
+          });
+      });
+      it('ERROR -PATCH - 200 responds with no changes in votes', () => {
+        return request(app)
+          .patch('/api/comments/2')
+          .send({ inv_votes: 'bb' })
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.comment[0].votes).to.equal(14);
           });
       });
       it('DELETE stats 204 deletes choosen comment', () => {
@@ -457,6 +484,11 @@ describe('/app', () => {
           .then(({ body }) => {
             expect(body.msg).to.equal('Bad request');
           });
+      });
+      it('ERROR - DELETE status 404 responds with "No Content" error message when given id does not exist ', () => {
+        return request(app)
+          .delete('/api/comments/555')
+          .expect(404);
       });
     });
   });
