@@ -9,7 +9,7 @@ exports.sqlErrorHandling = (err, req, res, next) => {
     err.code === '23503' &&
     err.constraint === 'comments_article_id_foreign'
   ) {
-    res.status(422).send({ msg: 'Id does not exist' });
+    res.status(422).send({ msg: 'Unprocessable Entity' });
   }
   if (errCodes[err.code]) {
     res.status(400).send({ msg: errCodes[err.code] });

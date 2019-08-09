@@ -73,14 +73,14 @@ describe('/app', () => {
           .get('/api/users/icellusedkars')
           .expect(200)
           .then(({ body }) => {
-            expect(body.user[0]).to.be.an('object');
-            expect(body.user[0]).to.eql({
+            expect(body.user).to.be.an('object');
+            expect(body.user).to.eql({
               username: 'icellusedkars',
               name: 'sam',
               avatar_url:
                 'https://avatars2.githubusercontent.com/u/24604688?s=460&v=4'
             });
-            expect(body.user[0]).to.have.keys('username', 'name', 'avatar_url');
+            expect(body.user).to.have.keys('username', 'name', 'avatar_url');
           });
       });
       it('ERROR - status 404 responds with a message "Not found"', () => {
@@ -126,6 +126,7 @@ describe('/app', () => {
             expect(body.msg).to.equal('Method not allowed');
           });
       });
+
       it('ERROR - GET status 404 responds with "Not found" message', () => {
         return request(app)
           .get('/api/articles/15')
@@ -158,7 +159,6 @@ describe('/app', () => {
           .send({ inc_vote: 100 })
           .expect(404)
           .then(({ body }) => {
-            // console.log(body);
             expect(body.msg).to.equal('Not found');
           });
       });
@@ -181,6 +181,7 @@ describe('/app', () => {
           })
           .expect(201)
           .then(({ body }) => {
+            // console.log(body.comment, 'test');
             expect(body.comment.body).to.equal(
               "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!"
             );
@@ -195,6 +196,15 @@ describe('/app', () => {
             expect(body.comment.author).to.equal('butter_bridge');
           });
       });
+      it('GET status 200 responds with a comment object containing username and comment body', () => {
+        return request(app)
+          .get('/api/articles/2/comments')
+          .expect(200)
+          .then(({ body }) => {
+            console.log(body);
+            expect(body.comments).to.eql([]);
+          });
+      });
       it('ERROR - POST status 422 responds with "Not found" error message', () => {
         return request(app)
           .post('/api/articles/25/comments')
@@ -205,7 +215,7 @@ describe('/app', () => {
           })
           .expect(422)
           .then(({ body: { msg } }) => {
-            expect(msg).to.equal('Id does not exist');
+            expect(msg).to.equal('Unprocessable Entity');
           });
       });
       it('ERROR - POST status 400 responds with "Bad request" error message', () => {
@@ -227,10 +237,10 @@ describe('/app', () => {
           .expect(200)
           .then(({ body }) => {
             // console.log(body)
-            expect(body.comment).to.be.sortedBy('created_at', {
+            expect(body.comments).to.be.sortedBy('created_at', {
               descending: true
             });
-            expect(body.comment[0]).to.have.keys(
+            expect(body.comments[0]).to.have.keys(
               'comment_id',
               'author',
               'article_id',
@@ -254,8 +264,8 @@ describe('/app', () => {
           .expect(200)
           .then(({ body }) => {
             // console.log(body, '<======test');
-            expect(body.comment).to.be.an('array');
-            expect(body.comment.length).to.equal(0);
+            expect(body.comments).to.be.an('array');
+            expect(body.comments.length).to.equal(0);
           });
       });
       it('ERROR - GET 404 responds with "Not found" error message', () => {
@@ -271,7 +281,8 @@ describe('/app', () => {
           .get('/api/articles/1/comments?order=asc')
           .expect(200)
           .then(({ body }) => {
-            expect(body.comment).to.be.sortedBy('created_at', {
+            // console.log(body)
+            expect(body.comments).to.be.sortedBy('created_at', {
               ascending: true
             });
           });
@@ -297,7 +308,7 @@ describe('/app', () => {
       });
       it('ERROR - PATCH status 405 responds with "Method not allowed" error message', () => {
         return request(app)
-          .patch('/api/topics')
+          .patch('/api/articles')
           .expect(405)
           .then(({ body }) => {
             expect(body.msg).to.equal('Method not allowed');
@@ -305,7 +316,7 @@ describe('/app', () => {
       });
       it('ERROR - PUT status 405 responds with "Method not allowed" error message', () => {
         return request(app)
-          .put('/api/topics')
+          .put('/api/articles')
           .expect(405)
           .then(({ body }) => {
             expect(body.msg).to.equal('Method not allowed');
@@ -418,7 +429,7 @@ describe('/app', () => {
           })
           .expect(200)
           .then(({ body }) => {
-            expect(body.comment[0]).to.eql({
+            expect(body.comment).to.eql({
               comment_id: 1,
               body:
                 "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
@@ -427,7 +438,7 @@ describe('/app', () => {
               votes: 32,
               created_at: '2017-11-22T12:36:03.389Z'
             });
-            expect(body.comment[0]).to.have.keys(
+            expect(body.comment).to.have.keys(
               'comment_id',
               'body',
               'article_id',
@@ -451,7 +462,7 @@ describe('/app', () => {
           .send({ unknown_key: 16 })
           .expect(200)
           .then(({ body }) => {
-            expect(body.comment[0].votes).to.equal(16);
+            expect(body.comment.votes).to.equal(16);
           });
       });
       it('ERROR -PATCH - 404 responds with "Not Found" error message when given comment_id does not exist', () => {
@@ -469,10 +480,10 @@ describe('/app', () => {
           .send({ inv_votes: 'bb' })
           .expect(200)
           .then(({ body }) => {
-            expect(body.comment[0].votes).to.equal(14);
+            expect(body.comment.votes).to.equal(14);
           });
       });
-      it.only('DELETE stats 204 deletes choosen comment', () => {
+      it('DELETE stats 204 deletes choosen comment', () => {
         return request(app)
           .delete('/api/comments/1')
           .expect(204);
@@ -485,7 +496,7 @@ describe('/app', () => {
             expect(body.msg).to.equal('Bad request');
           });
       });
-      it.only('ERROR - DELETE status 404 responds with "Bad request" error message when given id does not exist ', () => {
+      it('ERROR - DELETE status 404 responds with "Bad request" error message when given id does not exist ', () => {
         return request(app)
           .delete('/api/comments/555')
           .expect(404);

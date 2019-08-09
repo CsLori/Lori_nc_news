@@ -33,14 +33,15 @@ exports.insertCommentById = (req, res, next) => {
 
 exports.getCommentsById = (req, res, next) => {
   const { article_id } = req.params;
+  console.log(req.params);
   const { sort_by, order } = req.query;
   fetchArticleById(article_id)
     .then()
     .catch(next);
 
   fetchCommentsById(article_id, sort_by, order)
-    .then(comment => {
-      res.status(200).send({ comment });
+    .then(comments => {
+      res.status(200).send({ comments });
     })
     .catch(next);
 };

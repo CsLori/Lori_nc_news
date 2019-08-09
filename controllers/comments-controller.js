@@ -5,10 +5,8 @@ const {
 
 exports.updateCommentById = (req, res, next) => {
   patchCommentById(req.params, req.body)
-    .then(comment => {
-      if (!comment.length) {
-        res.status(404).send({ msg: 'Comment Not found' });
-      } else res.status(200).send({ comment });
+    .then(([comment]) => {
+      res.status(200).send({ comment });
     })
     .catch(next);
 };

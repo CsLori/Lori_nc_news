@@ -6,7 +6,7 @@ const {
   insertCommentById,
   getAllArticles
 } = require('../controllers/articles-controller');
-const {mehtodNotAllowed} = require('../error/index')
+const { mehtodNotAllowed } = require('../error/index');
 
 
 
@@ -18,7 +18,8 @@ articlesRouter
 articlesRouter
   .route('/:article_id/comments')
   .post(insertCommentById)
-  .get(getCommentsById).all(mehtodNotAllowed);
+  .get(getCommentsById)
+  .all(mehtodNotAllowed);
 
-articlesRouter.route('/').get(getAllArticles);
+articlesRouter.route('/').get(getAllArticles).all(mehtodNotAllowed);
 module.exports = articlesRouter;

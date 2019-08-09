@@ -28,7 +28,7 @@ exports.patchArticleById = ({ article_id }, { inc_vote }) => {
     .select('*')
     .from('articles')
     .where({ article_id })
-    .increment('votes', inc_vote)
+    .increment('votes', inc_vote || 0)
     .returning('*')
     .then(article => {
       if (typeof inc_vote !== 'number') {
@@ -47,21 +47,21 @@ exports.addCommentById = comment => {
 };
 
 exports.fetchCommentsById = (article_id, sort_by, order) => {
+  console.log(article_id)
   return connection
     .select(
-      'comments.comment_id',
-      'comments.votes',
-      'comments.created_at',
-      'comments.author',
-      'comments.body',
-      'comments.article_id'
+      'comment_id',
+      'votes',
+      'created_at',
+      'author',
+      'body',
+      'article_id'
     )
     .from('comments')
-    .where('comments.article_id', '=', article_id)
-    .leftJoin('articles', 'articles.article_id', 'comments.article_id')
-    .groupBy('comments.comment_id')
+    .where('article_id', '=', article_id)
+    
     .orderBy(sort_by || 'created_at', order || 'desc')
-    .returning('*');
+    
 };
 
 exports.selectAllArticles = ({ sort_by, order, author, topic }) => {
