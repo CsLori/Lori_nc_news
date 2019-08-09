@@ -472,7 +472,7 @@ describe('/app', () => {
             expect(body.comment[0].votes).to.equal(14);
           });
       });
-      it('DELETE stats 204 deletes choosen comment', () => {
+      it.only('DELETE stats 204 deletes choosen comment', () => {
         return request(app)
           .delete('/api/comments/1')
           .expect(204);
@@ -485,7 +485,7 @@ describe('/app', () => {
             expect(body.msg).to.equal('Bad request');
           });
       });
-      it('ERROR - DELETE status 404 responds with "No Content" error message when given id does not exist ', () => {
+      it.only('ERROR - DELETE status 404 responds with "Bad request" error message when given id does not exist ', () => {
         return request(app)
           .delete('/api/comments/555')
           .expect(404);

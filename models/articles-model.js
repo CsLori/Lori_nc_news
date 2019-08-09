@@ -17,7 +17,6 @@ exports.fetchArticleById = article_id => {
     .groupBy('articles.article_id')
     .count('comments.article_id as comment_count')
     .then(article => {
-      // console.log(article, 'controller')
       if (!article.length) {
         return Promise.reject({ status: 404, msg: 'Not found' });
       } else return article;
@@ -92,7 +91,6 @@ exports.selectAllArticles = ({ sort_by, order, author, topic }) => {
       }
     })
     .then(article => {
-      // console.log(article, 'comment count');
       if (!article.length) {
         return Promise.reject({ status: 404, msg: 'Not found' });
       } else return article;
