@@ -100,7 +100,7 @@ describe('/app', () => {
           });
       });
     });
-    describe.only('/articles/:id', () => {
+    describe('/articles/:id', () => {
       it('GET status 200 responds with an article object selected by id', () => {
         return request(app)
           .get('/api/articles/1')

@@ -34,7 +34,7 @@ exports.insertCommentById = (req, res, next) => {
 exports.getCommentsById = (req, res, next) => {
   const { article_id } = req.params;
   console.log(req.params, req.query, 'controller');
-  const { sort_by, order } = req.query;
+  const { sort_by, order, p } = req.query;
 
   const article = fetchArticleById(article_id);
   const comments = fetchCommentsById(article_id, sort_by, order);
