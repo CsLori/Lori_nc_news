@@ -16,6 +16,14 @@ exports.fetchArticleById = article_id => {
     .leftJoin('comments', 'comments.article_id', '=', 'articles.article_id')
     .groupBy('articles.article_id')
     .count('comments.article_id as comment_count')
+    .then(articles => {
+     return articles.map(article => {
+        let newObj = {};
+        const { author, ...resoOfArticle } = article;
+        newObj = { ...resoOfArticle, username: author };
+        return newObj;
+      });
+    })
     .then(article => {
       if (!article.length) {
         return Promise.reject({ status: 404, msg: 'Not found' });
@@ -46,16 +54,25 @@ exports.addCommentById = comment => {
     .returning('*');
 };
 
-exports.fetchCommentsById = (article_id, sort_by, order) => {
+exports.fetchCommentsById = (article_id, sort_by, order, limit = 10, p) => {
+  console.log(limit);
   return connection
     .select('comment_id', 'votes', 'created_at', 'author', 'body', 'article_id')
     .from('comments')
     .where('article_id', '=', article_id)
-
-    .orderBy(sort_by || 'created_at', order || 'desc');
+    .orderBy(sort_by || 'created_at', order || 'desc')
+    .limit(limit)
+    .offset(p * limit - limit);
 };
 
-exports.selectAllArticles = ({ sort_by, order, author, topic }) => {
+exports.selectAllArticles = ({
+  sort_by,
+  order,
+  author,
+  topic,
+  limit = 10,
+  p
+}) => {
   return connection
     .select(
       'articles.author',
@@ -70,8 +87,8 @@ exports.selectAllArticles = ({ sort_by, order, author, topic }) => {
     .groupBy('articles.article_id')
     .count('comments.article_id AS comment_count')
     .orderBy(sort_by || 'created_at', order || 'desc')
-    .limit(10)
-    // .offset(p * limit - limit)
+    .limit(limit)
+    .offset(p * limit - limit)
     .modify(authorQuery => {
       if (author) {
         authorQuery.where('articles.author', '=', author);
@@ -87,4 +104,11 @@ exports.selectAllArticles = ({ sort_by, order, author, topic }) => {
         return Promise.reject({ status: 404, msg: 'Not found' });
       } else return article;
     });
+};
+
+exports.insertArticle = article => {
+  return connection
+    .insert(article)
+    .into('articles')
+    .returning('*');
 };

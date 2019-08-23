@@ -100,17 +100,18 @@ describe('/app', () => {
           });
       });
     });
-    describe.only('/articles/:id', () => {
+    describe('/articles/:id', () => {
       it('GET status 200 responds with an article object selected by id', () => {
         return request(app)
           .get('/api/articles/1')
           .expect(200)
           .then(({ body }) => {
+            console.log(body);
             expect(body.article).to.eql({
               article_id: 1,
               title: 'Living in the shadow of a great man',
               topic: 'mitch',
-              author: 'butter_bridge',
+              username: 'butter_bridge',
               body: 'I find this existence challenging',
               created_at: '2018-11-15T12:21:54.171Z',
               votes: 100,
@@ -181,7 +182,6 @@ describe('/app', () => {
           })
           .expect(201)
           .then(({ body }) => {
-            // console.log(body.comment, 'test');
             expect(body.comment.body).to.equal(
               "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!"
             );
@@ -201,7 +201,6 @@ describe('/app', () => {
           .get('/api/articles/2/comments')
           .expect(200)
           .then(({ body }) => {
-            console.log(body);
             expect(body.comments).to.eql([]);
           });
       });
@@ -236,7 +235,6 @@ describe('/app', () => {
           .get('/api/articles/5/comments')
           .expect(200)
           .then(({ body }) => {
-            // console.log(body)
             expect(body.comments).to.be.sortedBy('created_at', {
               descending: true
             });
@@ -263,7 +261,6 @@ describe('/app', () => {
           .get('/api/articles/2/comments')
           .expect(200)
           .then(({ body }) => {
-            // console.log(body, '<======test');
             expect(body.comments).to.be.an('array');
             expect(body.comments.length).to.equal(0);
           });
@@ -281,10 +278,49 @@ describe('/app', () => {
           .get('/api/articles/1/comments?order=asc')
           .expect(200)
           .then(({ body }) => {
-            // console.log(body)
             expect(body.comments).to.be.sortedBy('created_at', {
               ascending: true
             });
+          });
+      });
+      it('GET status 200 responds with an array of comment objects with a limit of 10 as default', () => {
+        return request(app)
+          .get('/api/articles/1/comments')
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.comments).to.have.length(10);
+          });
+      });
+      it('GET status 200 responds with an array of comment objects with a given limit', () => {
+        return request(app)
+          .get('/api/articles/1/comments?limit=5')
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.comments).to.have.length(5);
+          });
+      });
+      it('ERROR - GET status 200 repsonds with an array of comment objects', () => {
+        return request(app)
+          .get('/api/articles/1/comments?limit=90')
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.comments).to.have.length(13);
+          });
+      });
+      it('ERROR - GET status 200 responds with a "Bad request" error message', () => {
+        return request(app)
+          .get('/api/articles/1/comments?limit=bb')
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.comments).to.have.length(13);
+          });
+      });
+      it('GET status 200 responds with an array of objects request from a given page', () => {
+        return request(app)
+          .get('/api/articles/1/comments?p=2')
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.comments).to.have.length(3);
           });
       });
     });
@@ -376,6 +412,35 @@ describe('/app', () => {
             });
           });
       });
+      it('POST status 201 responds with an article object', () => {
+        return request(app)
+          .post('/api/articles')
+          .send({
+            title: 'I am the greatest',
+            topic: 'mitch',
+            author: 'butter_bridge',
+            body: 'Die harder next time',
+            created_at: new Date(1416140514171),
+            votes: 377
+          })
+          .expect(201)
+          .then(({ body }) => {
+            expect(body.article[0].article_id).to.equal(13);
+            expect(body.article[0].body).to.equal('Die harder next time');
+          });
+      });
+      it.only('ERROR - POST 405 responds with "Invalid user request" message when user tries to use delete, patch or put method', () => {
+        const invalidMethods = ['delete', 'patch', 'put'];
+        const methodPromises = invalidMethods.map(method => {
+          return request(app)
+            [method]('/api/articles')
+            .expect(405)
+            .then(({ body }) => {
+              expect(body.msg).to.equal('Method not allowed');
+            });
+        });
+        return Promise.all(methodPromises);
+      });
       it('GET status 200 repsonds with an array of article objects ordered_by a valid custom column', () => {
         return request(app)
           .get('/api/articles?order=asc')
@@ -410,7 +475,7 @@ describe('/app', () => {
             expect(body.msg).to.equal('Not found');
           });
       });
-      it('GET 200 responds with an array of article objects up to 10 findings', () => {
+      it('GET status 200 responds with an array of article objects up to 10 findings', () => {
         return request(app)
           .get('/api/articles')
           .expect(200)
@@ -418,89 +483,188 @@ describe('/app', () => {
             expect(body.articles).to.have.length(10);
           });
       });
-    });
-
-    describe('/comments', () => {
-      it('PATCH status 200 responds with an object of updated comment', () => {
+      it('GET status 200 responds with an array of article objects up to 5 findings', () => {
         return request(app)
-          .patch('/api/comments/1')
-          .send({
-            inc_votes: 16
-          })
+          .get('/api/articles?limit=5')
           .expect(200)
           .then(({ body }) => {
-            expect(body.comment).to.eql({
-              comment_id: 1,
-              body:
-                "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
-              article_id: 9,
-              author: 'butter_bridge',
-              votes: 32,
-              created_at: '2017-11-22T12:36:03.389Z'
-            });
-            expect(body.comment).to.have.keys(
-              'comment_id',
-              'body',
-              'article_id',
-              'author',
-              'votes',
-              'created_at'
-            );
+            expect(body.articles).to.have.length(5);
           });
       });
-      it('ERROR - POST status 405 responds with "Method not allowed" error message', () => {
+      it('GET status 200 responds with an array of article objects', () => {
         return request(app)
-          .post('/api/comments/1')
-          .expect(405)
-          .then(({ body }) => {
-            expect(body.msg).to.equal('Method not allowed');
-          });
-      });
-      it('ERROR - PATCH status 200 responds with the original comment with its votes remaining unchanged when adding non-existing column', () => {
-        return request(app)
-          .patch('/api/comments/1')
-          .send({ unknown_key: 16 })
+          .get('/api/articles?p=2')
           .expect(200)
           .then(({ body }) => {
-            expect(body.comment.votes).to.equal(16);
+            expect(body.articles).to.have.length(2);
           });
       });
-      it('ERROR -PATCH - 404 responds with "Not Found" error message when given comment_id does not exist', () => {
+      it('ERROR - GET status 404 repsonds with a "Not found" error message', () => {
         return request(app)
-          .patch('/api/comments/350')
-          .send({ inv_votes: 16 })
+          .get('/api/articles?p=5')
           .expect(404)
           .then(({ body }) => {
-            expect(body.msg).to.equal('Comment Not found');
+            expect(body.msg).to.equal('Not found');
           });
       });
-      it('ERROR -PATCH - 200 responds with no changes in votes', () => {
+      it('ERROR - GET status 200 responds with the first page as default', () => {
         return request(app)
-          .patch('/api/comments/2')
-          .send({ inv_votes: 'bb' })
+          .get('/api/articles?p=bb')
           .expect(200)
           .then(({ body }) => {
-            expect(body.comment.votes).to.equal(14);
+            expect(body.articles).to.have.length(10);
           });
       });
-      it('DELETE stats 204 deletes choosen comment', () => {
-        return request(app)
-          .delete('/api/comments/1')
-          .expect(204);
-      });
-      it('ERROR - DELETE - 400 returns bad request when given incorrect comment_id', () => {
-        return request(app)
-          .delete('/api/comments/bananananas')
-          .expect(400)
-          .then(({ body }) => {
-            expect(body.msg).to.equal('Bad request');
+
+      describe('/comments', () => {});
+    });
+    it('PATCH status 200 responds with an object of updated comment', () => {
+      return request(app)
+        .patch('/api/comments/1')
+        .send({
+          inc_votes: 16
+        })
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.comment).to.eql({
+            comment_id: 1,
+            body:
+              "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+            article_id: 9,
+            author: 'butter_bridge',
+            votes: 32,
+            created_at: '2017-11-22T12:36:03.389Z'
           });
-      });
-      it('ERROR - DELETE status 404 responds with "Bad request" error message when given id does not exist ', () => {
-        return request(app)
-          .delete('/api/comments/555')
-          .expect(404);
-      });
+          expect(body.comment).to.have.keys(
+            'comment_id',
+            'body',
+            'article_id',
+            'author',
+            'votes',
+            'created_at'
+          );
+        });
+    });
+    it('ERROR - POST status 405 responds with "Method not allowed" error message', () => {
+      return request(app)
+        .post('/api/comments/1')
+        .expect(405)
+        .then(({ body }) => {
+          expect(body.msg).to.equal('Method not allowed');
+        });
+    });
+    it('ERROR - PATCH status 200 responds with the original comment with its votes remaining unchanged when adding non-existing column', () => {
+      return request(app)
+        .patch('/api/comments/1')
+        .send({ unknown_key: 16 })
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.comment.votes).to.equal(16);
+        });
+    });
+    it('ERROR -PATCH - 404 responds with "Not Found" error message when given comment_id does not exist', () => {
+      return request(app)
+        .patch('/api/comments/350')
+        .send({ inv_votes: 16 })
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).to.equal('Comment Not found');
+        });
+    });
+    it('ERROR -PATCH - 200 responds with no changes in votes', () => {
+      return request(app)
+        .patch('/api/comments/2')
+        .send({ inv_votes: 'bb' })
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.comment.votes).to.equal(14);
+        });
+    });
+    it('DELETE stats 204 deletes choosen comment', () => {
+      return request(app)
+        .delete('/api/comments/1')
+        .expect(204);
+    });
+    it('ERROR - DELETE - 400 returns bad request when given incorrect comment_id', () => {
+      return request(app)
+        .delete('/api/comments/bananananas')
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).to.equal('Bad request');
+        });
+    });
+    it('ERROR - DELETE status 404 responds with "Bad request" error message when given id does not exist ', () => {
+      return request(app)
+        .delete('/api/comments/555')
+        .expect(404);
+    });
+  });
+  describe('/comments', () => {
+    it('GET status 200 responds with an array of comment objects', () => {
+      return request(app)
+        .get('/api/comments')
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.comments).to.be.an('array');
+          expect(body.comments[0]).to.be.an('object');
+        });
+    });
+    it('GET status 200 responds with the first page with 10 findings as default', () => {
+      return request(app)
+        .get('/api/comments')
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.comments).to.have.length(10);
+        });
+    });
+    it('GET status 200 responds with the first page with given amount of findings', () => {
+      return request(app)
+        .get('/api/comments?limit=5')
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.comments).to.have.length(5);
+        });
+    });
+    it('ERROR - GET status 200 repsonds with an array of comment objects', () => {
+      return request(app)
+        .get('/api/comments?limit=90')
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.comments).to.have.length(18);
+        });
+    });
+    it('ERROR - GET status 200 responds with a "Bad request" error message', () => {
+      return request(app)
+        .get('/api/comments?limit=bb')
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.comments).to.have.length(18);
+        });
+    });
+    it('GET status 200 responds with the second page', () => {
+      return request(app)
+        .get('/api/comments?p=2')
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.comments).to.have.length(8);
+        });
+    });
+    it('ERROR - GET status 404 repsonds with a "Not found" error message', () => {
+      return request(app)
+        .get('/api/comments?p=5')
+        .expect(404)
+        .then(({ body }) => {
+          console.log(body, 'test');
+          expect(body.msg).to.equal('Not found');
+        });
+    });
+    it('ERROR - GET status 200 responds with the first page as default', () => {
+      return request(app)
+        .get('/api/comments?p=bb')
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.comments).to.have.length(10);
+        });
     });
   });
 });
