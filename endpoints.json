@@ -6,150 +6,127 @@
     "description": "serves an array of all topics",
     "queries": [],
     "exampleResponse": {
-      "topics": [{ "slug": "football", "description": "Footie!" }]
+      "topics": [
+        {
+          "slug": "football",
+          "description": "Footie!"
+        }
+      ]
     }
   },
   "GET /api/users/:username": {
-    "description": "serves an object of user information",
+    "description": "serves a user object",
     "queries": [],
     "exampleResponse": {
-            "user": {
-    "username": "butter_bridge",
-    "name": "jonny",
-    "avatar_url": "https: //www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg"
-        }
-      
+      "user": {
+        "username": "icellusedkars",
+        "name": "sam!",
+        "avatar_url": "https://avatars2.githubusercontent.com/u/24604688?s=460&v=4"
+      }
     }
   },
-  "GET /api/articles/:article_id": {
+  "GET /api/articles": {
     "description": "serves an array of all articles",
     "queries": [
-      "sort_by", 
+      "author",
+      "topic",
+      "sort_by",
       "order"
     ],
     "exampleResponse": {
-      "article": 
-      {
-    "title": "Living in the shadow of a great man",
-    "topic": "mitch",
-    "author": "butter_bridge",
-    "body": "I find this existence challenging",
-    "created_at": 1542284514171,
-    "votes": 100
-      }
-      
+      "articles": [
+        {
+          "title": "Seafood substitutions are increasing",
+          "topic": "cooking",
+          "author": "weegembump",
+          "body": "Text from the article..",
+          "created_at": "2016-11-22T12:36:03.389Z"
+        }
+      ]
     }
   },
-  "POST /api/articles/:article_id/comments": {
-    "description": "Posts a comment according to given article_id",
+  "GET /api/articles/:article_id": {
+    "description": "serves a article object",
     "queries": [],
     "exampleResponse": {
-      "comment": {
-  "body": "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
-  "belongs_to": "They're not exactly dogs, are they?",
-  "created_by": "butter_bridge",
-  "votes": 16,
-  "created_at": 1511354163389
+      "article": {
+        "article_id": 1,
+        "title": "Seafood substitutions are increasing",
+        "topic": "cooking",
+        "author": "weegembump",
+        "body": "Text from the article..",
+        "created_at": 1527695953341,
+        "votes": 100,
+        "comment_count": "13"
       }
     }
   },
   "PATCH /api/articles/:article_id": {
-    "description": "updates an article's votes",
+    "description": "updates then serves an article object",
     "queries": [],
     "exampleResponse": {
       "article": {
-        "title": "Living in the shadow of a great man",
-        "topic": "mitch",
-        "author": "butter_bridge",
-        "body": "I find this existence challenging",
-        "created_at": 1542284514171,
+        "article_id": 1,
+        "title": "Seafood substitutions are increasing",
+        "topic": "cooking",
+        "author": "weegembump",
+        "body": "Text from the article..",
+        "created_at": "2016-11-22T12:36:03.389Z",
         "votes": 100
       }
     }
   },
   "GET /api/articles/:article_id/comments": {
-    "description": "Shows an array of comments for given article_id",
-    "queries": ["sort_by", "order"],
-    "exampleResponse": {
-      "comments": [{
-  "body": " I carry a log — yes. Is it funny to you? It is not to me.",
-  "belongs_to": "Living in the shadow of a great man",
-  "created_by": "icellusedkars",
-  "votes": -100,
-  "created_at": 1416746163389
-      },
-      {
-  "body": "I hate streaming noses",
-  "belongs_to": "Living in the shadow of a great man",
-  "created_by": "icellusedkars",
-  "votes": 0,
-  "created_at": 1385210163389
-      }]
-    }
-  },
-  "GET /api/articles": {
-    "description": "Shows an array of article objects that can be filtered by, sort_by, order, author and topic",
+    "description": "serves an array of comment objects",
     "queries": [
-      "sort_by",
-      "order",
-      "author",
-      "topic"
+      "order"
     ],
     "exampleResponse": {
-      "articles": [
+      "comments": [
         {
-    "title": "Student SUES Mitch!",
-    "topic": "mitch",
-    "author": "rogersop",
-    "body":
-      "We all love Mitch and his wonderful, unique typing style. However, the volume of his typing has ALLEGEDLY burst another students eardrums, and they are now suing for damages",
-    "created_at": 1163852514171
-        },
-        {
-    "title": "UNCOVERED: catspiracy to bring down democracy",
-    "topic": "cats",
-    "author": "rogersop",
-    "body": "Bastet walks amongst us, and the cats are taking arms!",
-    "created_at": 1037708514171
-        },
-        {
-    "title": "A",
-    "topic": "mitch",
-    "author": "icellusedkars",
-    "body": "Delicious tin of cat food",
-    "created_at": 911564514171
-        },
-        {
-    "title": "Z",
-    "topic": "mitch",
-    "author": "icellusedkars",
-    "body": "I was hungry.",
-    "created_at": 785420514171
+          "comment_id": 1,
+          "author": "weegembump",
+          "body": "Text from the article..",
+          "created_at": "2016-11-22T12:36:03.389Z",
+          "votes": 100
         }
       ]
+    }
+  },
+  "POST /api/articles/:article_id/comments": {
+    "description": "creates and serves a comment object",
+    "queries": [],
+    "exampleResponse": {
+      "comment": {
+        "article_id": 3,
+        "comment_id": 1,
+        "author": "weegembump",
+        "body": "Text from the article..",
+        "created_at": "2016-11-22T12:36:03.389Z",
+        "votes": 100
+      }
     }
   },
   "PATCH /api/comments/:comment_id": {
-    "description": "Will update votes by a given number",
+    "description": "serves a comment object",
     "queries": [],
     "exampleResponse": {
-      "comment": [
-        {
-  "body":
-    "The beautiful thing about treasure is that it exists. Got to find out what kind of sheets these are; not cotton, not rayon, silky.",
-  "belongs_to": "Living in the shadow of a great man",
-  "created_by": "butter_bridge",
-  "votes": 14,
-  "created_at": 1479818163389
-        }
-      ]
+      "comment": {
+        "article_id": 3,
+        "comment_id": 1,
+        "author": "weegembump",
+        "body": "Text from the article..",
+        "created_at": "2016-11-22T12:36:03.389Z",
+        "votes": 100
+      }
     }
   },
   "DELETE /api/comments/:comment_id": {
-    "description": "Will delete given comment by comment_id",
+    "description": "deletes a comment",
     "queries": [],
-    "exampleResponse": {
-      "comment": {}
-    }
+    "exampleResponse": "status 204"
   }
 }
+
+
+
