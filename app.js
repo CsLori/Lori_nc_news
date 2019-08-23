@@ -7,7 +7,9 @@ const {
   errorHandling500,
   methodNotAllowed
 } = require('./error/index');
- 
+const cors = require('cors');
+
+app.use(cors());
 
 app.use(express.json());
 

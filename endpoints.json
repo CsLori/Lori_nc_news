@@ -14,8 +14,29 @@
       ]
     }
   },
+  "POST /api/topics": {
+    "description": "creates and serves a topic object",
+    "queries": [],
+    "exampleResponse": {
+      "topic": {
+        "slug": "football",
+        "description": "Footie!"
+      }
+    }
+  },
   "GET /api/users/:username": {
     "description": "serves a user object",
+    "queries": [],
+    "exampleResponse": {
+      "user": {
+        "username": "icellusedkars",
+        "name": "sam!",
+        "avatar_url": "https://avatars2.githubusercontent.com/u/24604688?s=460&v=4"
+      }
+    }
+  },
+  "POST /api/users": {
+    "description": "creates and serves an user object",
     "queries": [],
     "exampleResponse": {
       "user": {
@@ -45,6 +66,19 @@
       ]
     }
   },
+  "POST /api/articles/": {
+    "description": "creates and serves an article object",
+    "queries": [],
+    "exampleResponse": {
+      "article": {
+        "title": "Seafood substitutions are increasing",
+        "topic": "cooking",
+        "author": "weegembump",
+        "body": "Text from the article..",
+        "created_at": "2016-11-22T12:36:03.389Z"
+      }
+    }
+  },
   "GET /api/articles/:article_id": {
     "description": "serves a article object",
     "queries": [],
@@ -55,7 +89,7 @@
         "topic": "cooking",
         "author": "weegembump",
         "body": "Text from the article..",
-        "created_at": 1527695953341,
+        "created_at": "2016-11-22T12:36:03.389Z",
         "votes": 100,
         "comment_count": "13"
       }
@@ -75,6 +109,11 @@
         "votes": 100
       }
     }
+  },
+  "DELETE /api/articles/:article_id": {
+    "description": "deletes a comment",
+    "queries": [],
+    "exampleResponse": "status 204"
   },
   "GET /api/articles/:article_id/comments": {
     "description": "serves an array of comment objects",
@@ -127,6 +166,3 @@
     "exampleResponse": "status 204"
   }
 }
-
-
-
