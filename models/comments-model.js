@@ -18,9 +18,24 @@ exports.deleteCommentById = ({ comment_id }) => {
     return connection('comments')
       .where({ comment_id })
       .del()
-      .then(comment => {console.log(comment)
+      .then(comment => {
+        console.log(comment);
         if (comment === 0) {
           return Promise.reject({ status: 404, msg: 'Not found' });
         } else return comment;
       });
+};
+
+exports.selectAllComments = ({ limit = 10, p }) => {
+  return connection
+    .select('*')
+    .from('comments')
+    .limit(limit)
+    .offset(p * limit - limit)
+    .then(comments => {
+      if (!comments.length) {
+        return Promise.reject({ status: 404, msg: 'Not found' });
+        }
+      else return comments;
+    });
 };

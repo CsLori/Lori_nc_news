@@ -1,9 +1,15 @@
 const commentsRouter = require('express').Router();
 const {
   updateCommentById,
-  removeCommentById
+  removeCommentById,
+  getAllComments
 } = require('../controllers/comments-controller');
-const {mehtodNotAllowed} = require('../error/index');
+const { mehtodNotAllowed } = require('../error/index');
+
+commentsRouter
+  .route('/')
+  .get(getAllComments)
+  .all(mehtodNotAllowed);
 
 commentsRouter
   .route('/:comment_id')

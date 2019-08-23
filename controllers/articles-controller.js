@@ -3,7 +3,8 @@ const {
   patchArticleById,
   addCommentById,
   fetchCommentsById,
-  selectAllArticles
+  selectAllArticles,
+  insertArticle
 } = require('../models/articles-model');
 
 exports.getArticleById = (req, res, next) => {
@@ -33,11 +34,10 @@ exports.insertCommentById = (req, res, next) => {
 
 exports.getCommentsById = (req, res, next) => {
   const { article_id } = req.params;
-  console.log(req.params, req.query, 'controller');
-  const { sort_by, order, p } = req.query;
+  const { sort_by, order, limit, p } = req.query;
 
   const article = fetchArticleById(article_id);
-  const comments = fetchCommentsById(article_id, sort_by, order);
+  const comments = fetchCommentsById(article_id, sort_by, order, limit, p);
 
   Promise.all([article, comments])
     .then(([article, comments]) => {
@@ -52,6 +52,15 @@ exports.getAllArticles = (req, res, next) => {
   selectAllArticles(req.query)
     .then(articles => {
       res.status(200).send({ articles });
+    })
+    .catch(next);
+};
+
+exports.addArticle = (req, res, next) => {
+  const body = req.body;
+  insertArticle(body)
+    .then(article => {
+      res.status(201).send({ article });
     })
     .catch(next);
 };
