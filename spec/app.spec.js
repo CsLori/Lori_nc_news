@@ -495,10 +495,12 @@ describe('/app', () => {
         return request(app)
           .get('/api/articles')
           .expect(200)
-          .then(({ body: { articles } }) => {
-            expect(articles.every(article => article.total_count)).to.be.true;
+          .then(({ body: { total_count } }) => {
+            console.log(total_count);
+            expect(total_count).to.be.equal(12);
           });
       });
+
       it('GET status 200 responds with an array of article objects', () => {
         return request(app)
           .get('/api/articles?p=2')

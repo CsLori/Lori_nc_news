@@ -50,17 +50,14 @@ exports.getCommentsById = (req, res, next) => {
 };
 exports.getAllArticles = (req, res, next) => {
   const { sort_by, order, author, topic, limit, p } = req.query;
-  // let total = 0;
-  // selectAllArticles(sort_by, order, author, topic, 1000);
-  // total += articles.length
-  //   .then(articles => {
-  //     res.status(200).send({ articles });
-  //   })
-  //   .catch(next);
-  selectAllArticles(sort_by, order, author, topic, limit, p)
-    .then(articles => {
-      console.log(articles);
-      res.status(200).send({ articles });
+  let total_count = 0;
+  const totalCount = selectAllArticles(sort_by, order, author, topic, 1000);
+  const articles = selectAllArticles(sort_by, order, author, topic, limit, p);
+
+  Promise.all([totalCount, articles])
+    .then(([totalCount, articles]) => {
+      total_count += totalCount.length;
+      res.status(200).send({ total_count, articles });
     })
     .catch(next);
 };

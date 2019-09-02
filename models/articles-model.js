@@ -66,38 +66,40 @@ exports.fetchCommentsById = (article_id, sort_by, order, limit = 10, p) => {
 };
 
 exports.selectAllArticles = (sort_by, order, author, topic, limit = 10, p) => {
-  return connection
-    .select(
-      'articles.author',
-      'title',
-      'articles.article_id',
-      'topic',
-      'articles.created_at',
-      'articles.votes'
-    )
-    .from('articles')
-    .leftJoin('comments', 'comments.article_id', 'articles.article_id')
-    .groupBy('articles.article_id')
-    .count('comments.article_id AS comment_count')
-    .count('articles.article_id AS total_count')
-    .orderBy(sort_by || 'created_at', order || 'desc')
-    .limit(limit)
-    .offset(p * limit - limit)
-    .modify(authorQuery => {
-      if (author) {
-        authorQuery.where('articles.author', '=', author);
-      }
-    })
-    .modify(topicQuery => {
-      if (topic) {
-        topicQuery.where('articles.topic', '=', topic);
-      }
-    })
-    .then(article => {
-      if (!article.length) {
-        return Promise.reject({ status: 404, msg: 'Not found' });
-      } else return article;
-    });
+  return (
+    connection
+      .select(
+        'articles.author',
+        'title',
+        'articles.article_id',
+        'topic',
+        'articles.created_at',
+        'articles.votes'
+      )
+      .from('articles')
+      .leftJoin('comments', 'comments.article_id', 'articles.article_id')
+      .groupBy('articles.article_id')
+      .count('comments.article_id AS comment_count')
+      // .count('articles.article_id AS total_count')
+      .orderBy(sort_by || 'created_at', order || 'desc')
+      .limit(limit)
+      .offset(p * limit - limit)
+      .modify(authorQuery => {
+        if (author) {
+          authorQuery.where('articles.author', '=', author);
+        }
+      })
+      .modify(topicQuery => {
+        if (topic) {
+          topicQuery.where('articles.topic', '=', topic);
+        }
+      })
+      .then(article => {
+        if (!article.length) {
+          return Promise.reject({ status: 404, msg: 'Not found' });
+        } else return article;
+      })
+  );
 };
 
 exports.insertArticle = article => {
