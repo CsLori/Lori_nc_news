@@ -68,6 +68,17 @@ describe('/app', () => {
       });
     });
     describe('/users', () => {
+      it.only('GET status 200 responds with an array of user objects', () => {
+        return request(app)
+          .get('/api/users')
+          .expect(200)
+          .then(({ body }) => {
+            console.log(body);
+            expect(body.users).to.be.a('array');
+            expect(body.users[0]).to.be.a('object');
+          });
+      });
+
       it('GET status 200 responds with an object selected by username', () => {
         return request(app)
           .get('/api/users/icellusedkars')
@@ -491,7 +502,7 @@ describe('/app', () => {
             expect(body.articles).to.have.length(5);
           });
       });
-      it.only('GET status 200 responds total count of articles', () => {
+      it('GET status 200 responds total count of articles', () => {
         return request(app)
           .get('/api/articles')
           .expect(200)
