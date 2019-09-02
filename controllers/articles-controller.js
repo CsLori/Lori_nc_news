@@ -49,8 +49,17 @@ exports.getCommentsById = (req, res, next) => {
     .catch(next);
 };
 exports.getAllArticles = (req, res, next) => {
-  selectAllArticles(req.query)
+  const { sort_by, order, author, topic, limit, p } = req.query;
+  // let total = 0;
+  // selectAllArticles(sort_by, order, author, topic, 1000);
+  // total += articles.length
+  //   .then(articles => {
+  //     res.status(200).send({ articles });
+  //   })
+  //   .catch(next);
+  selectAllArticles(sort_by, order, author, topic, limit, p)
     .then(articles => {
+      console.log(articles);
       res.status(200).send({ articles });
     })
     .catch(next);

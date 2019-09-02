@@ -17,7 +17,7 @@ exports.fetchArticleById = article_id => {
     .groupBy('articles.article_id')
     .count('comments.article_id as comment_count')
     .then(articles => {
-     return articles.map(article => {
+      return articles.map(article => {
         let newObj = {};
         const { author, ...resoOfArticle } = article;
         newObj = { ...resoOfArticle, username: author };
@@ -65,14 +65,7 @@ exports.fetchCommentsById = (article_id, sort_by, order, limit = 10, p) => {
     .offset(p * limit - limit);
 };
 
-exports.selectAllArticles = ({
-  sort_by,
-  order,
-  author,
-  topic,
-  limit = 10,
-  p
-}) => {
+exports.selectAllArticles = (sort_by, order, author, topic, limit = 10, p) => {
   return connection
     .select(
       'articles.author',
@@ -86,6 +79,7 @@ exports.selectAllArticles = ({
     .leftJoin('comments', 'comments.article_id', 'articles.article_id')
     .groupBy('articles.article_id')
     .count('comments.article_id AS comment_count')
+    .count('articles.article_id AS total_count')
     .orderBy(sort_by || 'created_at', order || 'desc')
     .limit(limit)
     .offset(p * limit - limit)

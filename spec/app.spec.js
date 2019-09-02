@@ -429,7 +429,7 @@ describe('/app', () => {
             expect(body.article[0].body).to.equal('Die harder next time');
           });
       });
-      it.only('ERROR - POST 405 responds with "Invalid user request" message when user tries to use delete, patch or put method', () => {
+      it('ERROR - POST 405 responds with "Invalid user request" message when user tries to use delete, patch or put method', () => {
         const invalidMethods = ['delete', 'patch', 'put'];
         const methodPromises = invalidMethods.map(method => {
           return request(app)
@@ -489,6 +489,14 @@ describe('/app', () => {
           .expect(200)
           .then(({ body }) => {
             expect(body.articles).to.have.length(5);
+          });
+      });
+      it.only('GET status 200 responds total count of articles', () => {
+        return request(app)
+          .get('/api/articles')
+          .expect(200)
+          .then(({ body: { articles } }) => {
+            expect(articles.every(article => article.total_count)).to.be.true;
           });
       });
       it('GET status 200 responds with an array of article objects', () => {
